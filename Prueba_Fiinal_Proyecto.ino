@@ -2,7 +2,9 @@ byte frase_columnas[84] = {};
 
 int posicion_movil = 0; 
 
-byte letras[2][5] = {
+byte letras[4][5] = {
+  { 0B00000000, 0B00000000, 0B00000000, 0B00000000, 0B00000000 },
+  { 0B00000000, 0B00000010, 0B01010101, 0B10101010, 0B11101010 },
   { 0B00011111, 0B00100100, 0B00100100, 0B00011111, 0B00000000 },
   { 0B00111111, 0B00100101, 0B00100101, 0B00011010, 0B00000000 }
   /*
@@ -90,7 +92,7 @@ byte area_display[6] = {
   0B00010010*/
 };
 
-String frase_string = "ABAB";
+String frase_string = "BB";
 int posicion_disponible = 0;
 
 void inicializar(){
@@ -122,10 +124,10 @@ void inicializar(){
       
       posicion_disponible ++;
     } 
-    for(int b = 0 ; b<8 ; b++){
+    /*for(int b = 0 ; b<8 ; b++){
         bitWrite(frase_columnas[posicion_disponible], b ,LOW);
     }
-    posicion_disponible ++;
+    posicion_disponible ++;*/
   }
 }
 
@@ -139,7 +141,8 @@ void setup() {
 
 int VELOCIDAD = 0;
 void loop() {
-  //inicializar();
+  inicializar();
+   actualizar_display();
   while(true){    
     
     VELOCIDAD++;
@@ -161,9 +164,16 @@ void loop() {
 int REPETIR = 0;
 void actualizar_display(){
     if(posicion_movil == 0){
+
       
       // copiamos desde area total hacia area display
       // Se recorrren 7 columnas que son las que se pueden ver en el display
+
+      for(int i=0 ; i<7 ; i++){
+        for(int c=0; c<8; c++){
+          bitWrite(area_display[i], 7 - c, bitRead(frase_columnas[c], c));
+        }
+      }
       
     }
     for(int f = 0 ; f<7 ; f++){

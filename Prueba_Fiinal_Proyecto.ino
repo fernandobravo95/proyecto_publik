@@ -1,8 +1,18 @@
 byte frase_columnas[84] = {};
+byte c1 = 0B100001;
+byte c2 = 0B00000000;
+byte c3 = 0B11111110;
+byte c4 = 0B00100000;
+byte c5 = 0B00010000;
+ 
 
 int posicion_movil = 0; 
 
-byte letras[4][5] = {
+byte letras[7][7] = {
+  { 0B111110, 0B001001, 0B001001, 0B111110, 0B000000, 0B000000, 0B000000},
+  { 0B111111, 0B101001, 0B101001, 0B010110, 0B000000, 0B000000, 0B000000},
+  { 0B011110, 0B100001, 0B100001, 0B010010, 0B000000, 0B000000, 0B000000},
+
   { 0B00000000, 0B00000000, 0B00000000, 0B00000000, 0B00000000 },
   { 0B00000000, 0B00000010, 0B01010101, 0B10101010, 0B11101010 },
   { 0B00011111, 0B00100100, 0B00100100, 0B00011111, 0B00000000 },
@@ -78,12 +88,18 @@ byte letraA [] = {
 */
 
 byte area_display[6] = {
-  0B00111000,
+  0B00000000,
+  0B00000000,
+  0B00000000,
+  0B00000000,
+  0B00000000,
+  0B00000000,
+  /*0B00111000,
   0B00010000,
   0B00011110,
   0B00010010,
   0B00010010,
-  0B00010010
+  0B00010010*/
   /*0B00001100,
   0B00010010,
   0B00011110,
@@ -92,18 +108,24 @@ byte area_display[6] = {
   0B00010010*/
 };
 
-String frase_string = "BB";
+String frase_string = "CAB";
 int posicion_disponible = 0;
 
 void inicializar(){
   // pone la frase en blanco
-
-  for(int c=0 ; c<84 ; c++){
+  /*
+   frase_columnas[0] = c1;
+   frase_columnas[1] = c2;
+   frase_columnas[2] = c3;
+   frase_columnas[3] = c4;
+   frase_columnas[4] = c5;*/
+  /*for(int c=0 ; c<84 ; c++){
     frase_columnas[c] = 0B00000000;
-  }
+  }*/
   
   
   int tamano = frase_string.length();
+  
   for(int i=0; i<tamano; i++){
     char letra = frase_string.charAt(i);
     int posicion_buscada = letra - 65;
@@ -124,10 +146,10 @@ void inicializar(){
       
       posicion_disponible ++;
     } 
-    /*for(int b = 0 ; b<8 ; b++){
+    for(int b = 0 ; b<8 ; b++){
         bitWrite(frase_columnas[posicion_disponible], b ,LOW);
     }
-    posicion_disponible ++;*/
+    posicion_disponible ++;
   }
 }
 
@@ -169,13 +191,15 @@ void actualizar_display(){
       // copiamos desde area total hacia area display
       // Se recorrren 7 columnas que son las que se pueden ver en el display
 
-      for(int i=0 ; i<7 ; i++){
+      for(int i=0 ; i<8 ; i++){
         for(int c=0; c<8; c++){
-          bitWrite(area_display[i], 7 - c, bitRead(frase_columnas[c], c));
+          bitWrite(area_display[i], c, bitRead(frase_columnas[7-c], i));
+          //bitWrite(area_display[i], 7 - c, HIGH);
         }
       }
       
     }
+    /*
     for(int f = 0 ; f<7 ; f++){
         int temp = bitRead(area_display[f], 7);
         for(int c=0; c<8; c++){
@@ -187,12 +211,12 @@ void actualizar_display(){
           
         } 
         //bitWrite(area_display[c], c ,HIGH);
-          /*for(int b = 0 ; b<8 ; b++){
-             //bitWrite(area_display[c], 7 - b ,!!bitRead(frase_columnas[c],7-b));
-             bitWrite(area_display[c], 7 - b ,!!bitRead(frase_columnas[c],7-b));
-          }*/
+          //--for(int b = 0 ; b<8 ; b++){
+          //--   //bitWrite(area_display[c], 7 - b ,!!bitRead(frase_columnas[c],7-b));
+          //--   bitWrite(area_display[c], 7 - b ,!!bitRead(frase_columnas[c],7-b));
+          //--}
         
-    }
+    }*/
    
   
 }

@@ -187,8 +187,7 @@ void loop() {
 int REPETIR = 0;
 void actualizar_display(){
     if(posicion_movil == 0){
-
-      
+            
       // copiamos desde area total hacia area display
       // Se recorrren 7 columnas que son las que se pueden ver en el display
 
@@ -198,15 +197,24 @@ void actualizar_display(){
           //bitWrite(area_display[i], 7 - c, HIGH);
         }
       }
-      
+      posicion_movil = 7;     
       
     }else{
+      
       for(int f=0; f<6; f++){
         area_display[f] = area_display[f] << 1;
       }
+      // aqui ya desplacé todo a la izquierda 
+
+  //LLENAR VACIO
+        for(int i=0 ; i<6 ; i++){
+          bitWrite(area_display[i], 0, bitRead(frase_columnas[posicion_movil], i));
+        }
+         posicion_movil++;    
+             
      }
 
-    posicion_movil++;
+    
     /*
     for(int f = 0 ; f<7 ; f++){
         int temp = bitRead(area_display[f], 7);

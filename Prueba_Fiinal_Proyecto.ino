@@ -5,11 +5,11 @@ byte c3 = 0B11111110;
 byte c4 = 0B00100000;
 byte c5 = 0B00010000;
  
-
+int TAMANO_ESPACIO = 2; 
 int posicion_movil = 0; 
 
 byte letras[7][7] = {
-  { 0B111110, 0B001001, 0B001001, 0B111110, 0B000000, 0B000000, 0B000000},
+  { 0B111110, 0B001111, 0B111110, 0B000000, 0B000000, 0B000000},
   { 0B111111, 0B101001, 0B101001, 0B010110, 0B000000, 0B000000, 0B000000},
   { 0B011110, 0B100001, 0B100001, 0B010010, 0B000000, 0B000000, 0B000000},
 
@@ -126,31 +126,37 @@ void inicializar(){
   
   
   int tamano = frase_string.length();
-  
+
+
+  // RECORRO CARACTER POR CARACTER PARA DIBUJARLA(BYTES) EN FRASE_COLUMNA
   for(int i=0; i<tamano; i++){
+    // CHAR letra = 'C' --> 67 // la variable letra ya es codigo ASCCI(para usar calculos matematicos)
     char letra = frase_string.charAt(i);
-    int posicion_buscada = letra - 65;
+    // transformamos el ascci que inician en 0. para hacer uso del array de letras(donde tengo los dibujos de cada letra"Bytes")
+    int posicion_buscada = letra - 65; 
     //byte letra_buscada[7] = letras[posicion_buscada];
     int tamano_buscado = tamanos[posicion_buscada];
 
-    for(int j=0; j<tamano_buscado; j++) {
+     //cada letra esta compuesta por columnas, esas columnas son bytes, entonces recorro los bytes(que componen la letra) 
+     //y seran escritos en "frase_columnas"  
+    for(int j=0; j<tamano_buscado; j++) { //columna
       // Copiar
 
-      for(int b = 0 ; b<8 ; b++){
-        //bitWrite(frase_columnas[posicion_disponible], 7 - b ,letras[posicion_buscada][b]);
-        
-       bitWrite(frase_columnas[posicion_disponible], b ,bitRead(letras[posicion_buscada][j],b));
-         //bitWrite(area_display[c],                     7 - b ,!!bitRead(frase_columnas[c]       ,7-b));
-        
-       // bitWrite(frase_columnas[posicion_disponible], 7 - b ,HIGH);
+      for(int b = 0 ; b<8 ; b++){  // cada uno de los bits de la columna
+
+        //copio el bit de mi "letra" a "frase_columnas"               
+        bitWrite(frase_columnas[posicion_disponible], b ,bitRead(letras[posicion_buscada][j],b));
       }
       
       posicion_disponible ++;
     } 
+    /*
+    // recorro para colocar una fila en blanco
     for(int b = 0 ; b<8 ; b++){
         bitWrite(frase_columnas[posicion_disponible], b ,LOW);
-    }
-    posicion_disponible ++;
+    }*/
+       
+    posicion_disponible += TAMANO_ESPACIO;
   }
 }
 
@@ -206,7 +212,7 @@ void actualizar_display(){
       }
       // aqui ya desplacé todo a la izquierda 
 
-  //LLENAR VACIO
+        //LLENAR VACIO
         for(int i=0 ; i<6 ; i++){
           bitWrite(area_display[i], 0, bitRead(frase_columnas[posicion_movil], i));
         }
@@ -265,7 +271,7 @@ int x=0;
       
     }
     digitalWrite(fila+PIN_FILAS_INICIAL, HIGH);
-    //digitalWrite(fila+PIN_FILAS_INICIAL, LOW);
+    //digitalWrite(fila+PIN_FILAS_INICIAL, LOW);  
     //delay(500);
   }
 }

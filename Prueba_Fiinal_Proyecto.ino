@@ -112,6 +112,7 @@ String frase_string = "CAB";
 int posicion_disponible = 0;
 
 void inicializar(){
+  //letras[0][0] = letras[0][0] << 2;
   // pone la frase en blanco
   /*
    frase_columnas[0] = c1;
@@ -198,7 +199,14 @@ void actualizar_display(){
         }
       }
       
-    }
+      
+    }else{
+      for(int f=0; f<6; f++){
+        area_display[f] = area_display[f] << 1;
+      }
+     }
+
+    posicion_movil++;
     /*
     for(int f = 0 ; f<7 ; f++){
         int temp = bitRead(area_display[f], 7);

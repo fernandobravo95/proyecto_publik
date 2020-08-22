@@ -112,7 +112,7 @@ byte area_display[6] = {
   0B00010010*/
 };
 
-String frase_string = "CABCABCAB";
+String frase_string = "CAB";
 int posicion_disponible = 0;
 
 
@@ -176,6 +176,7 @@ void setup() {
 }
 
 int VELOCIDAD = 0;
+
 void loop() {
   inicializar();
    actualizar_display();
@@ -199,7 +200,7 @@ void loop() {
 
 int REPETIR = 0;
 void actualizar_display(){
-    if(posicion_movil == 0){
+    /*if(posicion_movil == 0){
             
       // copiamos desde area total hacia area display
       // Se recorrren 7 columnas que son las que se pueden ver en el display
@@ -212,8 +213,11 @@ void actualizar_display(){
       }
       posicion_movil = 8;     
       
-    }else{
-      
+    }else{*/
+  
+    if(posicion_movil >= posicion_disponible){
+      posicion_movil = 0;
+    }   
       for(int f=0; f<6; f++){
         area_display[f] = area_display[f] << 1;
       }
@@ -225,7 +229,7 @@ void actualizar_display(){
         }
          posicion_movil++;    
              
-     }
+     //}
 
     
     /*

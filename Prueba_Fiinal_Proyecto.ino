@@ -5,11 +5,15 @@ byte c3 = 0B11111110;
 byte c4 = 0B00100000;
 byte c5 = 0B00010000;
  
-int TAMANO_ESPACIO = 2; 
+int TAMANO_ESPACIO = 1; 
 int posicion_movil = 0; 
 
 byte letras[7][7] = {
-  { 0B111110, 0B001111, 0B111110, 0B000000, 0B000000, 0B000000},
+  { 0B111110,  0B001001, 0B001001, 0B111110, 0B000000, 0B000000, 0B000000 }, //A
+  //{ 0B111111,  0B101001, 0B101001, 0B010110, 0B000000, 0B000000, 0B000000 }, //B
+  //{ 0B011110,  0B100001, 0B100001, 0B010010, 0B000000, 0B000000, 0B000000 }, //C
+  
+  //{ 0B111110, 0B001111, 0B001001, 0B111110, 0B000000, 0B000000, 0B000000},
   { 0B111111, 0B101001, 0B101001, 0B010110, 0B000000, 0B000000, 0B000000},
   { 0B011110, 0B100001, 0B100001, 0B010010, 0B000000, 0B000000, 0B000000},
 
@@ -108,8 +112,10 @@ byte area_display[6] = {
   0B00010010*/
 };
 
-String frase_string = "CAB";
+String frase_string = "CABCABCAB";
 int posicion_disponible = 0;
+
+
 
 void inicializar(){
   //letras[0][0] = letras[0][0] << 2;
@@ -136,6 +142,7 @@ void inicializar(){
     int posicion_buscada = letra - 65; 
     //byte letra_buscada[7] = letras[posicion_buscada];
     int tamano_buscado = tamanos[posicion_buscada];
+
 
      //cada letra esta compuesta por columnas, esas columnas son bytes, entonces recorro los bytes(que componen la letra) 
      //y seran escritos en "frase_columnas"  
@@ -203,7 +210,7 @@ void actualizar_display(){
           //bitWrite(area_display[i], 7 - c, HIGH);
         }
       }
-      posicion_movil = 7;     
+      posicion_movil = 8;     
       
     }else{
       

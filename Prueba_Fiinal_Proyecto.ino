@@ -90,6 +90,9 @@ void reiniciar(){
 
 ////-------------------------------------- DISPLAY -----------------------------------------------
 
+
+int debug = 1;
+
 byte frase_columnas[84] = {};
  
 int TAMANO_ESPACIO = 1; 
@@ -215,7 +218,7 @@ void inicializar(){
 void setup() {
   Serial.begin(9600);
   
-  for (int j=2; j<17; j++){ 
+  for (int j=0; j<17; j++){ 
   pinMode(j, OUTPUT);  
   }
 }
@@ -224,11 +227,8 @@ int VELOCIDAD = 0;
 
 void loop() {
 
-  Serial.println("Presionó tecla del 0 al 9");
+  //Serial.println("Inició");
 
-  digitalWrite(21, HIGH);
-  digitalWrite(20, LOW);
-  
   inicializar();
   actualizar_display();
   
@@ -251,14 +251,14 @@ void loop() {
   {
     // Aqui ya sé que ha presionado una tecla
     Serial.println("Presionó algo");
-    digitalWrite(8,HIGH);
+    __digitalWrite(8,HIGH);
     delay(500); 
     
     // aki kiero zaver zi presione entre 1 y 0
     
   }
   else {
-    digitalWrite(8,LOW);
+    __digitalWrite(8,LOW);
     }   
   /*  if(keypressed >= '0' && keypressed <= '9'){
       Serial.println("Presionó tecla del 0 al 9");
@@ -438,15 +438,23 @@ void actualizar_display(){
 
 int PIN_FILAS_INICIAL = 8;
 
-void mostrar_display(){
-  
-  for (int f=0; f<6; f++){
-    if(f==0){
-      digitalWrite(PIN_FILAS_INICIAL+5,LOW);
-    }else{
-      digitalWrite(PIN_FILAS_INICIAL+f-1,LOW);
-    }
+void _digitalWrite(int pin, bool valor){
+  if (debug && (pin == 0 || pin == 1)){
     
+  }else{
+    digitalWrite(pin,valor);  
+  }
+}
+
+void mostrar_display(){
+  //Serial.print("Mostrar display");
+  for (int f=0; f<6; f++){
+    if(f==0){                   //antes de mostrar display se borra la fial anterior
+      _digitalWrite(PIN_FILAS_INICIAL+5,LOW);       //como la fila a mostrar es 0(fila 1) la anterior fila debe ser fila 6()
+    }else{
+      _digitalWrite(PIN_FILAS_INICIAL+f-1,LOW);      //como la fila a mostrar es mayor a 0 borro la actual -1
+    }
+    //Serial.print(area_display[f]);
     pintar_fila(area_display[f], f);
     //delay(10);
     //limpiar_fila(f);
@@ -460,19 +468,20 @@ void pintar_fila(byte datos, int fila) {
 int x=0;
   while(x++<100){
     for(int i=0; i<8; i++){ //recorre columna  
-      digitalWrite(i, !bitRead(datos,7 - i)); 
+            
+      _digitalWrite(i, !bitRead(datos,7 - i)); 
       
     }
-    digitalWrite(fila+PIN_FILAS_INICIAL, HIGH);
-    //digitalWrite(fila+PIN_FILAS_INICIAL, LOW);  
+    _digitalWrite(fila+PIN_FILAS_INICIAL, HIGH);
+    //_digitalWrite(fila+PIN_FILAS_INICIAL, LOW);  
     //delay(500);
   }
 }
 
 void limpiar_fila(int fila) {
-  digitalWrite(fila+PIN_FILAS_INICIAL, LOW);
+  _digitalWrite(fila+PIN_FILAS_INICIAL, LOW);
   for(int c=0; c<8; c++){ //recorre columna  
-    digitalWrite(c, LOW); 
+    _digitalWrite(c, LOW); 
   } 
 }
 
@@ -481,7 +490,7 @@ void pintar_letra(byte letra[]){
   for(int i=0; i<6; i++){ //recorro los bytes(las filas que conforman la letra)
     pintar_fila(letra[i], i+PIN_FILAS_INICIAL);
     delay(5);
-    digitalWrite(i+PIN_FILAS_INICIAL, LOW);
+    _digitalWrite(i+PIN_FILAS_INICIAL, LOW);
     delay(5);    
   }  
 }

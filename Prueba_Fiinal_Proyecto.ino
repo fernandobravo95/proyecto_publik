@@ -215,17 +215,20 @@ void inicializar(){
 void setup() {
   Serial.begin(9600);
   
-  for (int j=0; j<17; j++){ 
+  for (int j=2; j<17; j++){ 
   pinMode(j, OUTPUT);  
   }
-
-  pinMode(15, OUTPUT);
 }
 
 int VELOCIDAD = 0;
 
 void loop() {
-  /*
+
+  Serial.println("Presionó tecla del 0 al 9");
+
+  digitalWrite(21, HIGH);
+  digitalWrite(20, LOW);
+  
   inicializar();
   actualizar_display();
   
@@ -240,9 +243,9 @@ void loop() {
       VELOCIDAD = 0;
     }
     //delay(30);
-  } */
+  } 
 
-  char keypressed = myKeypad.getKey();
+ /* char keypressed = myKeypad.getKey();
   
   if (keypressed != NO_KEY)
   {

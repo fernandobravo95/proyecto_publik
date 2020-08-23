@@ -1,54 +1,132 @@
+#include <Keypad.h>
+
+
+////-------------------------------------- TECLADO -----------------------------------------------
+
+const byte numRows= 4; //Numero de filas en el teclado
+const byte numCols= 3; //Numero de columnas en el teclado
+
+//El mapa de teclas define la tecla presionada de acuerdo con la fila y las columnas
+char keymap[numRows][numCols]= 
+{
+  {'1', '2', '3'}, 
+  {'4', '5', '6'}, 
+  {'7', '8', '9'},
+  {'*', '0', '#'}
+};
+
+//Código que muestra las conexiones del teclado a los terminales arduino
+byte rowPins[numRows] = {16,17,18,19};
+byte colPins[numCols]= {15,14,7};
+
+//Inicializa una instancia de la clase de teclado
+Keypad myKeypad= Keypad(makeKeymap(keymap), rowPins, colPins, numRows, numCols);
+
+char teclaActual = ' ';
+int  cantidadPresionadas = 0;
+String frase = "";
+char letraActual = '¿';
+String autorizado = "NO";
+
+String frase1 = "";
+
+char actualizarLetraActual(){
+  
+  char letraInicial = '?';
+  char letraFinal   = '?';
+  int cantidadPresionadasLocal = 0;
+  
+  if(teclaActual=='1'){
+    // AQUI NO SE HACE NADA
+    
+  }else if(teclaActual=='2' || teclaActual=='3' || teclaActual=='4' || teclaActual=='5' || teclaActual=='6' || teclaActual=='8'){
+
+    cantidadPresionadasLocal = (cantidadPresionadas-1) % 3;
+
+    if(teclaActual=='2'){
+      letraInicial = 'A'; 
+    }else if(teclaActual=='3'){
+      letraInicial = 'D'; 
+    }else if(teclaActual=='4'){
+      letraInicial = 'G'; 
+    }else if(teclaActual=='5'){
+      letraInicial = 'J'; 
+    }else if(teclaActual=='6'){
+      letraInicial = 'M'; 
+    }else if(teclaActual=='8'){
+      letraInicial = 'T'; 
+    }
+
+    letraFinal = letraInicial + cantidadPresionadasLocal;
+
+  }else if(teclaActual=='7' || teclaActual=='9'){
+    // AQUI se puede presionar 4 veces
+
+    cantidadPresionadasLocal = (cantidadPresionadas-1) % 4;
+    //Serial.println("  cantidad presionadas " );
+    //Serial.println(cantidadPresionadas);
+
+    if(teclaActual=='7'){
+      letraInicial = 'P'; 
+    }else if(teclaActual=='9'){
+      letraInicial = 'W'; 
+    }
+
+    letraFinal = letraInicial + cantidadPresionadasLocal;
+
+  }else{
+    // AQUI PRESIONE EL CERO
+    letraFinal = '_';
+  }
+  return letraFinal;
+}
+
+
+void reiniciar(){
+  frase = "";
+  teclaActual = ' ';
+  cantidadPresionadas = 0;
+}
+
+////-------------------------------------- DISPLAY -----------------------------------------------
+
 byte frase_columnas[84] = {};
-byte c1 = 0B100001;
-byte c2 = 0B00000000;
-byte c3 = 0B11111110;
-byte c4 = 0B00100000;
-byte c5 = 0B00010000;
  
 int TAMANO_ESPACIO = 1; 
 int posicion_movil = 0; 
 
-byte letras[7][7] = {
-  { 0B111110,  0B001001, 0B001001, 0B111110, 0B000000, 0B000000, 0B000000 }, //A
-  //{ 0B111111,  0B101001, 0B101001, 0B010110, 0B000000, 0B000000, 0B000000 }, //B
-  //{ 0B011110,  0B100001, 0B100001, 0B010010, 0B000000, 0B000000, 0B000000 }, //C
+byte letras[26][7] = {
   
-  //{ 0B111110, 0B001111, 0B001001, 0B111110, 0B000000, 0B000000, 0B000000},
-  { 0B111111, 0B101001, 0B101001, 0B010110, 0B000000, 0B000000, 0B000000},
-  { 0B011110, 0B100001, 0B100001, 0B010010, 0B000000, 0B000000, 0B000000},
-
-  { 0B00000000, 0B00000000, 0B00000000, 0B00000000, 0B00000000 },
-  { 0B00000000, 0B00000010, 0B01010101, 0B10101010, 0B11101010 },
-  { 0B00011111, 0B00100100, 0B00100100, 0B00011111, 0B00000000 },
-  { 0B00111111, 0B00100101, 0B00100101, 0B00011010, 0B00000000 }
-  /*
-  { B00110000, B01001000, B01001000, B01111000, B01001000, B01001000 }, //A
-  { B01110000, B01001000, B01001000, B01110000, B01001000, B01110000 }, //B
-  { B00110000, B01001000, B01000000, B01000000, B01001000, B00110000 }, //C
-  { B01110000, B01001000, B01001000, B01001000, B01001000, B01110000 }, //D
-  { B01111000, B01000000, B01110000, B01000000, B01000000, B01111000 }, //E
-  { B01111000, B01000000, B01000000, B01110000, B01000000, B01000000 }, //F
-  { B00110000, B01001000, B01000000, B01011000, B01001000, B00110000 }, //G
-  { B01001000, B01001000, B01111000, B01001000, B01001000, B01001000 }, //H
-  { B01110000, B00100000, B00100000, B00100000, B00100000, B01110000 }, //I
-  { B00011000, B00001000, B00001000, B01001000, B01001000, B00110000 }, //J
-  { B01001000, B01010000, B01100000, B01010000, B01001000, B01001000 }, //K
-  { B01000000, B01000000, B01000000, B01000000, B01000000, B01111000 }, //L
-  { B01000100, B01101100, B01010100, B01010100, B01000100, B01000100 }, //M
-  { B01000100, B01100100, B01010100, B01001100, B01000100, B01000100 }, //N
-  { B00110000, B01001000, B01001000, B01001000, B01001000, B00110000 }, //O
-  { B01110000, B01001000, B01001000, B01110000, B01000000, B01000000 }, //P
-  { B00110000, B01001000, B01001000, B01001000, B00110000, B00001000 }, //Q
-  { B01110000, B01001000, B01001000, B01110000, B01001000, B01001000 }, //R
-  { B00110000, B01001000, B01100000, B00011000, B01001000, B00110000 }, //S
-  { B01111100, B00010000, B00010000, B00010000, B00010000, B00010000 }, //T
-  { B01001000, B01001000, B01001000, B01001000, B01001000, B00110000 }, //U
-  { B01000100, B01000100, B01000100, B01000100, B00101000, B00010000 }, //V
-  { B01000100, B01000100, B01000100, B01010100, B01010100, B00101000 }, //W
-  { B01000100, B00101000, B00010000, B00101000, B01000100, B01000100 }, //X
-  { B01000100, B01000100, B00101000, B00010000, B00010000, B00010000 }, //Y
-  { B01111000, B00001000, B00010000, B00100000, B01000000, B01111000 }  //Z  
-  */
+  //{ 0B111110, 0B001001, 0B001001, 0B111110, 0B000000, 0B000000, 0B000000 }, //A
+  //{ 0B111111, 0B101001, 0B101001, 0B010110, 0B000000, 0B000000, 0B000000 }, //B
+  //{ 0B011110, 0B100001, 0B100001, 0B010010, 0B000000, 0B000000, 0B000000 }, //C 
+  
+  { 0B111110, 0B001001, 0B001001, 0B111110, 0B000000, 0B000000, 0B000000 }, //A
+  { 0B111111, 0B101001, 0B101001, 0B010110, 0B000000, 0B000000, 0B000000 }, //B
+  { 0B011110, 0B100001, 0B100001, 0B010010, 0B000000, 0B000000, 0B000000 }, //C
+  { 0B111111, 0B100001, 0B100001, 0B011110, 0B000000, 0B000000, 0B000000 }, //D
+  { 0B111111, 0B100101, 0B100101, 0B100001, 0B000000, 0B000000, 0B000000 }, //E
+  { 0B111111, 0B001001, 0B001001, 0B000001, 0B000000, 0B000000, 0B000000 }, //F
+  { 0B011110, 0B100001, 0B101001, 0B011010, 0B000000, 0B000000, 0B000000 }, //G
+  { 0B111111, 0B000100, 0B000100, 0B111111, 0B000000, 0B000000, 0B000000 }, //H
+  { 0B100001, 0B111111, 0B100001, 0B000000, 0B000000, 0B000000, 0B000000 }, //I
+  { 0B011000, 0B100000, 0B100001, 0B011111, 0B000000, 0B000000, 0B000000 }, //J
+  { 0B111111, 0B000100, 0B001010, 0B110001, 0B000000, 0B000000, 0B000000 }, //K
+  { 0B111111, 0B100000, 0B100000, 0B100000, 0B000000, 0B000000, 0B000000 }, //L
+  { 0B111111, 0B000010, 0B001100, 0B000010, 0B111111, 0B000000, 0B000000 }, //M
+  { 0B111111, 0B000010, 0B000100, 0B001000, 0B111111, 0B000000, 0B000000 }, //N
+  { 0B011110, 0B100001, 0B100001, 0B011110, 0B000000, 0B000000, 0B000000 }, //O
+  { 0B111111, 0B001001, 0B001001, 0B000110, 0B000000, 0B000000, 0B000000 }, //P
+  { 0B001110, 0B010001, 0B010001, 0B101110, 0B000000, 0B000000, 0B000000 }, //Q
+  { 0B111111, 0B001001, 0B001001, 0B110110, 0B000000, 0B000000, 0B000000 }, //R
+  { 0B010110, 0B100101, 0B101001, 0B011010, 0B000000, 0B000000, 0B000000 }, //S
+  { 0B000001, 0B000001, 0B111111, 0B000001, 0B000001, 0B000000, 0B000000 }, //T
+  { 0B011111, 0B100000, 0B100000, 0B011111, 0B000000, 0B000000, 0B000000 }, //U
+  { 0B001111, 0B010000, 0B100000, 0B010000, 0B001111, 0B000000, 0B000000 }, //V
+  { 0B011111, 0B100000, 0B011000, 0B100000, 0B011111, 0B000000, 0B000000 }, //W
+  { 0B110001, 0B001010, 0B000100, 0B001010, 0B110001, 0B000000, 0B000000 }, //X
+  { 0B000011, 0B000100, 0B111000, 0B000100, 0B000011, 0B000000, 0B000000 }, //Y
+  { 0B110001, 0B101001, 0B100101, 0B100011, 0B000000, 0B000000, 0B000000 }, //Z  
 };
 
 byte tamanos[] = {
@@ -80,17 +158,6 @@ byte tamanos[] = {
   4,//Z
 };
 
-/*
-byte letraA [] = {
-  0B00011000,
-  0B00100100,
-  0B00100100,
-  0B00111100,
-  0B00100100,
-  0B00100100
-};
-*/
-
 byte area_display[6] = {
   0B00000000,
   0B00000000,
@@ -98,18 +165,6 @@ byte area_display[6] = {
   0B00000000,
   0B00000000,
   0B00000000,
-  /*0B00111000,
-  0B00010000,
-  0B00011110,
-  0B00010010,
-  0B00010010,
-  0B00010010*/
-  /*0B00001100,
-  0B00010010,
-  0B00011110,
-  0B00010010,
-  0B00010010,
-  0B00010010*/
 };
 
 String frase_string = "CAB";
@@ -118,19 +173,7 @@ int posicion_disponible = 0;
 
 
 void inicializar(){
-  //letras[0][0] = letras[0][0] << 2;
-  // pone la frase en blanco
-  /*
-   frase_columnas[0] = c1;
-   frase_columnas[1] = c2;
-   frase_columnas[2] = c3;
-   frase_columnas[3] = c4;
-   frase_columnas[4] = c5;*/
-  /*for(int c=0 ; c<84 ; c++){
-    frase_columnas[c] = 0B00000000;
-  }*/
-  
-  
+    
   int tamano = frase_string.length();
 
 
@@ -170,33 +213,169 @@ void inicializar(){
 
 
 void setup() {
+  Serial.begin(9600);
+  
   for (int j=0; j<17; j++){ 
   pinMode(j, OUTPUT);  
   }
+
+  pinMode(15, OUTPUT);
 }
 
 int VELOCIDAD = 0;
 
 void loop() {
+  /*
   inicializar();
-   actualizar_display();
-  while(true){    
-    
-    VELOCIDAD++;
-    
-    mostrar_display();
-    
-    
+  actualizar_display();
+  
+  while(true){  
+        
+    VELOCIDAD++;    
+    mostrar_display();    
     delay(10);
-    if(VELOCIDAD==10){
+    
+    if(VELOCIDAD == 10){
       actualizar_display();
       VELOCIDAD = 0;
     }
     //delay(30);
-  }
+  } */
+
+  char keypressed = myKeypad.getKey();
   
+  if (keypressed != NO_KEY)
+  {
+    // Aqui ya sé que ha presionado una tecla
+    Serial.println("Presionó algo");
+    digitalWrite(8,HIGH);
+    delay(500); 
+    
+    // aki kiero zaver zi presione entre 1 y 0
+    
+  }
+  else {
+    digitalWrite(8,LOW);
+    }   
+  /*  if(keypressed >= '0' && keypressed <= '9'){
+      Serial.println("Presionó tecla del 0 al 9");
+      
+        // Estoy autorizado a ingresar valores?
+        if(autorizado == "SI"){
+           if(keypressed != '1'){
+  
+              // la tecla que presione ya la habia presionado antes
+              if(keypressed == teclaActual){
+                // Ocurre cuando estoy en la misma tecla
+                cantidadPresionadas++;
+              }else{
+                // Ocurre cuando me cambio de tecla
+                teclaActual = keypressed;
+                cantidadPresionadas = 1;
+              }
+              // El usuario está escribiendo algo  
+              // Serial.println("El usuario está escribiendo algo");
+              // Aqui digo que la letra actual es la tecla presionada
+              teclaActual=keypressed;
+  
+              char a = actualizarLetraActual();
+              Serial.println("==================");
+              Serial.println(a);
+              Serial.println("==================");
+              Serial.println("");
+              Serial.println("");
+              Serial.println("");
+  
+            }else{
+                Serial.println("Botón Inservible");
+            }
+  
+        }else{
+           Serial.println("Hey amigo calma, ha presionado AZULES PERO NO ESTA AUTORIZADO Oprima (A)");
+        }
+      
+      
+      
+      
+    }else{
+      //Serial.println("tecla de control");
+      if(keypressed=='A'){
+        // Aqui se debe reiniciar todo
+        Serial.println("Ya está Aurizado, hagale mijo");
+        autorizado = "SI";
+        reiniciar();
+  
+      }else if(keypressed=='B'){
+        if(autorizado=="SI"){
+  
+          char nueva = actualizarLetraActual();
+          //Serial.println("variable nueva trae");
+          //Serial.println(nueva);
+          //Serial.println("");
+          //Serial.println("");
+  
+          if(nueva != '_'){
+            frase1 = frase;
+            frase = frase + nueva;
+            String a = "Buena, ahora la longitud es: ";
+            a = a + frase.length();
+            Serial.println(a);
+  
+           if(frase.length() > 12){
+              Serial.println("la frase es muy larga - MAXIMO 12 Caracteres");
+           }
+            
+          }else{
+            Serial.println("Hey amigo calma, no ha presionado AZULES validas");
+            //Serial.println("Hey vierjo, que le voy a confirmar si no ha presionado nada??????");
+          }
+  
+          teclaActual = '?';
+          cantidadPresionadas = 0;
+        }else{
+          Serial.println("Hey amigo calma, ha presionado ROJAS PERO NO ESTA AUTORIZADO Oprima (A)");
+          //Serial.println("Hey amigo calma, ha presionado confirmar PERO NO ESTA AUTORIZADO Retroceda");
+        }
+        
+        
+      }else if(keypressed=='C'){
+        if(autorizado=="SI"){      
+          int len = frase.length();
+          if(len == 0){
+            Serial.println("No ha ingresado nada");
+          }else if(len < 4 ){
+            Serial.println("la frase es muy corta - MINIMO 4 Caracteres");
+          }else if(len > 12 ){
+            Serial.println("la frase es muy larga - MAXIMO 12 Caracteres");
+            Serial.println(frase1); 
+            autorizado="NO"; 
+          }else{
+  
+              //if (frase != '____________' ){
+                Serial.println(frase);
+                autorizado="NO";
+              //}else{
+                //Serial.println("La frase solo contiene espacios");
+              //}
+          }
+        }else{
+          Serial.println("Hey amigo calma, ha presionado ROJAS PERO NO ESTA AUTORIZADO Oprima (A)");
+        }
+  
+  
+      }else if(keypressed=='*' || keypressed=='#' || keypressed=='D'){
+        if(autorizado=="SI"){      
+            Serial.println("Botón Inservible");        
+        }else{
+          Serial.println("Hey amigo calma, ha presionado ROJAS PERO NO ESTA AUTORIZADO Oprima (A)");
+        }
+      }
+    }
+    
+  } */   
   
 }
+
 
 int REPETIR = 0;
 void actualizar_display(){

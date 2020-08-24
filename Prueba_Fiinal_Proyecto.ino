@@ -8,7 +8,8 @@ const byte numCols = 3; // Numero de columnas en el teclado
 
 // El mapa de teclas define la tecla presionada de acuerdo con la fila y las
 // columnas
-char keymap[numRows][numCols] = { { '1', '2', '3' },
+char keymap[numRows][numCols] = { 
+    { '1', '2', '3' },
     { '4', '5', '6' },
     { '7', '8', '9' },
     { '*', '0', '#' } };
@@ -78,8 +79,9 @@ char actualizarLetraActual()
         letraFinal = letraInicial + cantidadPresionadasLocal;
     }
     else {
+        Serial.println("PRESIONE EL CERO, ESTA EN LA FUNCION actualizarLetraActual()");
         // AQUI PRESIONE EL CERO
-        letraFinal = '_';
+        letraFinal = '[';
     }
     return letraFinal;
 }
@@ -89,14 +91,46 @@ char actualizarLetraActual()
 byte frase_columnas[84] = {};
 
 int TIEMPO_VISUALIZACION_LETRA = 20;
-int TAMANO_ESPACIO = 1;
+int TAMANO_ESPACIO = 1;   //TAMAÑO DE ESPACIO
 int posicion_movil = 0;
 int desplazarce = 1;
-int debug = 0;
+int debug = 1;
 int mostrar_frase_movimiento = 0;
 
+String frase_mensaje = "";
+
 byte letras[27][7] = {
-  { 0B111110, 0B001001, 0B001001, 0B111110, 0B000000, 0B000000, 0B000000 }, //A
+    { B0000000, 0B000000, 0B111110, 0B001001, 0B001001, 0B111110, 0B000000 }, //A
+    { B0000000, 0B000000, 0B111111, 0B101001, 0B101001, 0B010110, 0B000000 }, //B
+    { B0000000, 0B000000, 0B011110, 0B100001, 0B100001, 0B010010, 0B000000 }, //C
+    { B0000000, 0B000000, 0B111111, 0B100001, 0B100001, 0B011110, 0B000000 }, //D
+    { B0000000, 0B000000, 0B111111, 0B100101, 0B100101, 0B100001, 0B000000 }, //E
+    { B0000000, 0B000000, 0B111111, 0B001001, 0B001001, 0B000001, 0B000000 }, //F
+    { B0000000, 0B000000, 0B011110, 0B100001, 0B101001, 0B011010, 0B000000 }, //G
+    { B0000000, 0B000000, 0B111111, 0B000100, 0B000100, 0B111111, 0B000000 }, //H  
+    { B0000000, 0B000000, 0B100001, 0B111111, 0B100001, 0B000000, 0B000000 } , //I 
+    { B0000000, 0B000000, 0B011000, 0B100000, 0B100001, 0B011111, 0B000000 }, //J
+    { B0000000, 0B000000, 0B111111, 0B000100, 0B001010, 0B110001, 0B000000 }, //K
+    { B0000000, 0B000000, 0B111111, 0B100000, 0B100000, 0B100000, 0B000000 }, //L
+    { B0000000, 0B000000, 0B111111, 0B000010, 0B001100, 0B000010, 0B111111 }, //M
+    { B0000000, 0B000000, 0B111111, 0B000010, 0B000100, 0B001000, 0B111111 }, //N
+    { B0000000, 0B000000, 0B011110, 0B100001, 0B100001, 0B011110, 0B000000 }, //O
+    { B0000000, 0B000000, 0B111111, 0B001001, 0B001001, 0B000110, 0B000000 }, //P
+    { B0000000, 0B000000, 0B001110, 0B010001, 0B010001, 0B101110, 0B000000 }, //Q
+    { B0000000, 0B000000, 0B111111, 0B001001, 0B001001, 0B110110, 0B000000 }, //R
+    { B0000000, 0B000000, 0B010110, 0B100101, 0B101001, 0B011010, 0B000000 }, //S
+    { B0000000, 0B000000, 0B000001, 0B000001, 0B111111, 0B000001, 0B000001 }, //T
+    { B0000000, 0B000000, 0B011111, 0B100000, 0B100000, 0B011111, 0B000000 }, //U
+    { B0000000, 0B000000, 0B001111, 0B010000, 0B100000, 0B010000, 0B001111 }, //V
+    { B0000000, 0B000000, 0B011111, 0B100000, 0B011000, 0B100000, 0B011111 }, //W
+    { B0000000, 0B000000, 0B110001, 0B001010, 0B000100, 0B001010, 0B110001 }, //X
+    { B0000000, 0B000000, 0B000011, 0B000100, 0B111000, 0B000100, 0B000011 }, //Y
+    { B0000000, 0B000000, 0B110001, 0B101001, 0B100101, 0B100011, 0B000000 },  //Z
+    { B0000000, 0B000000, 0B100000, 0B100000, 0B100000, 0B100000, 0B000000 }  //SPACE _ 
+};
+
+  /*
+  { 0B111110, 0B001001, 0B001001, 0B111110, 0B000000, B0000000, 0B000000 }, //A
   { 0B111111, 0B101001, 0B101001, 0B010110, 0B000000, 0B000000, 0B000000 }, //B
   { 0B011110, 0B100001, 0B100001, 0B010010, 0B000000, 0B000000, 0B000000 }, //C
   { 0B111111, 0B100001, 0B100001, 0B011110, 0B000000, 0B000000, 0B000000 }, //D
@@ -122,36 +156,37 @@ byte letras[27][7] = {
   { 0B110001, 0B001010, 0B000100, 0B001010, 0B110001, 0B000000, 0B000000 }, //X
   { 0B000011, 0B000100, 0B111000, 0B000100, 0B000011, 0B000000, 0B000000 }, //Y
   { 0B110001, 0B101001, 0B100101, 0B100011, 0B000000, 0B000000, 0B000000 }  //Z
-  //{ 0B110001, 0B101001, 0B100101, 0B100011, 0B000000, 0B000000, 0B000000 }  //SPACE
-};
+  { 0B000000, 0B000000, 0B000000, 0B000000, 0B000000, 0B000000, 0B000000 }  //SPACE
+};*/
 
 byte tamanos[] = {
-    4, // A
-    4, // B
-    4, // C
-    4, // D
-    4, // E
-    4, // F
-    4, // G
-    4, // H
-    3, // I
-    4, // J
-    4, // K
-    4, // L
-    5, // M
-    5, // N
-    4, // O
-    4, // P
-    4, // Q
-    4, // R
-    4, // S
-    5, // T
-    4, // U
-    5, // V
-    5, // W
-    5, // X
-    5, // Y
-    4, // Z
+    6, // A
+    6, // B
+    6, // C
+    6, // D
+    6, // E
+    6, // F
+    6, // G
+    6, // H
+    5, // I
+    6, // J
+    6, // K
+    6, // L
+    7, // M
+    7, // N
+    6, // O
+    6, // P
+    6, // Q
+    6, // R
+    6, // S
+    7, // T
+    6, // U
+    7, // V
+    7, // W
+    7, // X
+    7, // Y
+    6, // Z
+    6, // SPACE
 };
 
 byte area_display[6] = {
@@ -258,44 +293,22 @@ void loop()
     
                         char a = actualizarLetraActual();
 
+                        evento_presionar_tecla(a);
+                                                                                              
+                                              
                         
-                        frase_string = "";
-                        frase_string = a;
-                                               
-                        Serial.println("==================*********");
-                        Serial.println(frase_string);
-                        Serial.println("==================");
-                        Serial.println("");
-                        Serial.println("");
-                        Serial.println("");
-
-                        inicializar();
-                        actualizar_display();
-                        desplazarce = 0;
-                        
-                        for(int i=0; i<TIEMPO_VISUALIZACION_LETRA; i++){
-                            VELOCIDAD++;
-                            mostrar_display();   
-                            delay(1);
-                            
-                            if(VELOCIDAD==10){
-                                actualizar_display();
-                                VELOCIDAD = 0;
-                            }                                              
-                        }
-
-                        frase_string = "";
-                        limpiar_area_display();    
-                        limpiar_frase_columnas();
-                        mostrar_display();
                                             
                     
                 }
                 else {
-                    Serial.println("Hey amigo calma, ha presionado AZULES PERO NO ESTA AUTORIZADO Oprima (1)");
+                   // frase_mensaje = "ERROR PRESIONE UNO";
+                    
+                    Serial.println("...Hey amigo calma, ha presionado AZULES PERO NO ESTA AUTORIZADO Oprima (1)");
+
+                    //mostrar_frase_movimiento = 2;
                 }
             }
-            else {   //LE PARECE A DIEGOO QUE FALTA UN VALIDACION PARA SBER SI ANTES YA NO ESTABA UTORIZADO
+            else {   //ME PARECE A MI QUE FALTA UN VALIDACION PARA SBER SI ANTES YA NO ESTABA UTORIZADO
                 Serial.println("tecla de control");
                 if (keypressed == '1') {            // 1 SIRVE PARA INICIAR LA CAPTURA DE LETRAS 
                     // Aqui se debe reiniciar todo
@@ -312,7 +325,7 @@ void loop()
                         //Serial.println("");
                         //Serial.println("");
     
-                        if (nueva != '_') {
+                        if (nueva != '-') {
                             frase1 = frase;
                             frase = frase + nueva;
                             String a = "Buena, ahora la longitud es: ";
@@ -348,6 +361,9 @@ void loop()
                         else if (len > 12) {
                             Serial.println("la frase es muy larga - MAXIMO 12 Caracteres");
                             Serial.println(frase1);
+
+                              
+                             //mostrar_frase_movimiento = 1;              
                                                            
                             autorizado = "NO";
                         }
@@ -382,13 +398,21 @@ void loop()
         } else {
 
             //Serial.print(".");
-            if (mostrar_frase_movimiento == 1){
+            if (mostrar_frase_movimiento == 1 || mostrar_frase_movimiento == 2){
              
+                
+                
+                if (mostrar_frase_movimiento == 1){
+                    frase_string = frase.substring(0);
+                } else {
+                    frase_string = frase_mensaje.substring(0);
+                } 
+                
+                Serial.println(" *********** ");
+
                 inicializar();
                 actualizar_display();
                 desplazarce = 1;
-                frase_string = frase.substring(0);
-                Serial.println(" *********** ");
                 
                 //strcpy(frase, frase_string);
                 Serial.println(frase_string);
@@ -509,7 +533,7 @@ void mostrar_display()
 void pintar_fila(byte datos, int fila)
 {
     int x = 0;
-    while (x++ < 100) {
+    while (x++ < 50) {
         for (int i = 0; i < 8; i++) { // recorre columna
             _digitalWrite(i, !bitRead(datos, 7 - i));
         }
@@ -535,8 +559,7 @@ void limpiar_area_display(){
 
 void pintar_letra(byte letra[])
 {
-    for (int i = 0; i < 6;
-         i++) { // recorro los bytes(las filas que conforman la letra)
+    for (int i = 0; i < 6; i++) { // recorro los bytes(las filas que conforman la letra)
         pintar_fila(letra[i], i + PIN_FILAS_INICIAL);
         delay(5);
         _digitalWrite(i + PIN_FILAS_INICIAL, LOW);
@@ -555,11 +578,11 @@ void _digitalWrite(int pin, bool valor)
 
 
 void limpiar_frase_columnas() {
-    int longitud = 0;
+    //int longitud = 0;
 
-    longitud = sizeof(frase_columnas);
+    //longitud = sizeof(frase_columnas);
 
-    for (int i=0; i<longitud; i++){
+    for (int i=0; i<7; i++){
         frase_columnas [i] = 0B00000000;   
     }   
 }
@@ -578,3 +601,40 @@ void reiniciar(){
      actualizar_display(); 
      mostrar_frase_movimiento = 0;
 } 
+
+void evento_presionar_tecla(char a){
+
+   frase_string = "";
+   frase_string = a;
+
+    Serial.println("==================*********");
+    Serial.println(frase_string);
+    Serial.println("==================");
+    Serial.println("");
+    Serial.println("");
+    Serial.println("");
+  
+  inicializar();
+  actualizar_display();
+  desplazarce = 0;
+  
+  for(int i=0; i<TIEMPO_VISUALIZACION_LETRA; i++){
+      VELOCIDAD++;
+      mostrar_display();   
+      delay(1);
+      
+      if(VELOCIDAD==10){
+          actualizar_display();
+          VELOCIDAD = 0;
+      }                                              
+  }
+
+  frase_string = "";
+  limpiar_area_display();    
+  mostrar_display();
+  limpiar_frase_columnas();
+} 
+
+void evento_mostrar_frase(String frase){
+    
+}

@@ -96,6 +96,7 @@ void reiniciar()
 
 byte frase_columnas[84] = {};
 
+int TIEMPO_VISUALIZACION_LETRA = 20;
 int TAMANO_ESPACIO = 1;
 int posicion_movil = 0;
 int desplazarce = 1;
@@ -207,17 +208,7 @@ int posicion_disponible = 0;
 
 void inicializar()
 {
-    // letras[0][0] = letras[0][0] << 2;
-    // pone la frase en blanco
-    /*
- frase_columnas[0] = c1;
- frase_columnas[1] = c2;
- frase_columnas[2] = c3;
- frase_columnas[3] = c4;
- frase_columnas[4] = c5;*/
-    /*for(int c=0 ; c<84 ; c++){
-  frase_columnas[c] = 0B00000000;
-}*/
+    posicion_disponible = 0;
 
     int tamano = frase_string.length();
 
@@ -311,12 +302,35 @@ void loop()
                         teclaActual = keypressed;
     
                         char a = actualizarLetraActual();
+
+                        
+                        frase_string = "";
+                        frase_string = a;
+                                               
+                        Serial.println("==================*********");
+                        Serial.println(frase_string);
                         Serial.println("==================");
-                        Serial.println(a);
-                        Serial.println("==================");
                         Serial.println("");
                         Serial.println("");
                         Serial.println("");
+
+                        inicializar();
+                        actualizar_display();
+                        desplazarce = 0;
+                        
+                        for(int i=0; i<TIEMPO_VISUALIZACION_LETRA; i++){
+                            VELOCIDAD++;
+                            mostrar_display();   
+                            delay(1);
+                            
+                            if(VELOCIDAD==10){
+                                actualizar_display();
+                                VELOCIDAD = 0;
+                            }                                              
+                        }
+
+                        frase_string = "";
+                        
                     
                 }
                 else {
@@ -401,9 +415,9 @@ void loop()
         } 
     }// cierre while   
 
-    /*
+    
 Serial.print("HOla ya pueden integrar");
-// Esto es solo para Funcionamiento correcto del display
+/*// Esto es solo para Funcionamiento correcto del display
 inicializar();
 actualizar_display();
 while(true){

@@ -1,12 +1,10 @@
+
+
 byte frase_columnas[84] = {};
-byte c1 = 0B100001;
-byte c2 = 0B00000000;
-byte c3 = 0B11111110;
-byte c4 = 0B00100000;
-byte c5 = 0B00010000;
  
 int TAMANO_ESPACIO = 1; 
 int posicion_movil = 0; 
+int desplazarce = 0;
 
 byte letras[7][7] = {
   { 0B111110,  0B001001, 0B001001, 0B111110, 0B000000, 0B000000, 0B000000 }, //A
@@ -198,9 +196,12 @@ void loop() {
   
 }
 
+
 int REPETIR = 0;
 void actualizar_display(){
-    /*if(posicion_movil == 0){
+    if(desplazarce == 0){
+
+      posicion_movil = 0;
             
       // copiamos desde area total hacia area display
       // Se recorrren 7 columnas que son las que se pueden ver en el display
@@ -211,9 +212,9 @@ void actualizar_display(){
           //bitWrite(area_display[i], 7 - c, HIGH);
         }
       }
-      posicion_movil = 8;     
+      //posicion_movil = 8;     
       
-    }else{*/
+    }else{
   
     if(posicion_movil >= posicion_disponible){
       posicion_movil = 0;
@@ -229,7 +230,7 @@ void actualizar_display(){
         }
          posicion_movil++;    
              
-     //}
+     }
 
     
     /*

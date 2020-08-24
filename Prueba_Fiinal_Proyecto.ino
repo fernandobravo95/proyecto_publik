@@ -1,10 +1,101 @@
+#include <Keypad.h>
 
+
+////-------------------------------------- TECLADO -----------------------------------------------
+
+const byte numRows= 4; //Numero de filas en el teclado
+const byte numCols= 3; //Numero de columnas en el teclado
+
+//El mapa de teclas define la tecla presionada de acuerdo con la fila y las columnas
+char keymap[numRows][numCols]= 
+{
+  {'1', '2', '3'}, 
+  {'4', '5', '6'}, 
+  {'7', '8', '9'},
+  {'*', '0', '#'}
+};
+
+//Código que muestra las conexiones del teclado a los terminales arduino
+byte rowPins[numRows] = {16,17,18,19};
+byte colPins[numCols]= {15,14,7};
+
+//Inicializa una instancia de la clase de teclado
+Keypad myKeypad= Keypad(makeKeymap(keymap), rowPins, colPins, numRows, numCols);
+
+char teclaActual = ' ';
+int  cantidadPresionadas = 0;
+String frase = "";
+char letraActual = '¿';
+String autorizado = "NO";
+
+String frase1 = "";
+
+char actualizarLetraActual(){
+  
+  char letraInicial = '?';
+  char letraFinal   = '?';
+  int cantidadPresionadasLocal = 0;
+  
+  if(teclaActual=='1'){
+    // AQUI NO SE HACE NADA
+    
+  }else if(teclaActual=='2' || teclaActual=='3' || teclaActual=='4' || teclaActual=='5' || teclaActual=='6' || teclaActual=='8'){
+
+    cantidadPresionadasLocal = (cantidadPresionadas-1) % 3;
+
+    if(teclaActual=='2'){
+      letraInicial = 'A'; 
+    }else if(teclaActual=='3'){
+      letraInicial = 'D'; 
+    }else if(teclaActual=='4'){
+      letraInicial = 'G'; 
+    }else if(teclaActual=='5'){
+      letraInicial = 'J'; 
+    }else if(teclaActual=='6'){
+      letraInicial = 'M'; 
+    }else if(teclaActual=='8'){
+      letraInicial = 'T'; 
+    }
+
+    letraFinal = letraInicial + cantidadPresionadasLocal;
+
+  }else if(teclaActual=='7' || teclaActual=='9'){
+    // AQUI se puede presionar 4 veces
+
+    cantidadPresionadasLocal = (cantidadPresionadas-1) % 4;
+    //Serial.println("  cantidad presionadas " );
+    //Serial.println(cantidadPresionadas);
+
+    if(teclaActual=='7'){
+      letraInicial = 'P'; 
+    }else if(teclaActual=='9'){
+      letraInicial = 'W'; 
+    }
+
+    letraFinal = letraInicial + cantidadPresionadasLocal;
+
+  }else{
+    // AQUI PRESIONE EL CERO
+    letraFinal = '_';
+  }
+  return letraFinal;
+}
+
+
+void reiniciar(){
+  frase = "";
+  teclaActual = ' ';
+  cantidadPresionadas = 0;
+}
+
+////-------------------------------------- DISPLAY -----------------------------------------------
 
 byte frase_columnas[84] = {};
  
 int TAMANO_ESPACIO = 1; 
 int posicion_movil = 0; 
-int desplazarce = 0;
+int desplazarce = 1;
+int debug = 1;
 
 byte letras[7][7] = {
   { 0B111110,  0B001001, 0B001001, 0B111110, 0B000000, 0B000000, 0B000000 }, //A
@@ -168,18 +259,32 @@ void inicializar(){
 
 
 void setup() {
-  for (int j=0; j<17; j++){ 
-  pinMode(j, OUTPUT);  
-  }
+
+  Serial.begin(9600);
+  
+  if (debug == 1 ) {
+
+    for (int j=2; j<17; j++){ 
+    pinMode(j, OUTPUT);  
+    }
+
+  } else {
+    for (int j=0; j<17; j++){ 
+    pinMode(j, OUTPUT);  
+    }
+  }  
 }
 
 int VELOCIDAD = 0;
 
 void loop() {
+   
+  Serial.print("HOla ya pueden integrar");
+  // Esto es solo para Funcionamiento correcto del display
   inicializar();
-   actualizar_display();
+  actualizar_display();
   while(true){    
-    
+
     VELOCIDAD++;
     
     mostrar_display();
@@ -192,14 +297,18 @@ void loop() {
     }
     //delay(30);
   }
+
+  
+
+
   
   
-}
+} //cierra loop
 
 
 int REPETIR = 0;
 void actualizar_display(){
-    if(desplazarce == 0){
+    if(desplazarce == 0){     //MODO DE VISUALIZACIION DE FRASE ESTATICA
 
       posicion_movil = 0;
             
@@ -214,7 +323,7 @@ void actualizar_display(){
       }
       //posicion_movil = 8;     
       
-    }else{
+    }else{    // FRASE DESPLAZAMIENTO SUAVE
   
     if(posicion_movil >= posicion_disponible){
       posicion_movil = 0;
@@ -261,9 +370,9 @@ void mostrar_display(){
   
   for (int f=0; f<6; f++){
     if(f==0){
-      digitalWrite(PIN_FILAS_INICIAL+5,LOW);
+      _digitalWrite(PIN_FILAS_INICIAL+5,LOW);
     }else{
-      digitalWrite(PIN_FILAS_INICIAL+f-1,LOW);
+      _digitalWrite(PIN_FILAS_INICIAL+f-1,LOW);
     }
     
     pintar_fila(area_display[f], f);
@@ -279,19 +388,19 @@ void pintar_fila(byte datos, int fila) {
 int x=0;
   while(x++<100){
     for(int i=0; i<8; i++){ //recorre columna  
-      digitalWrite(i, !bitRead(datos,7 - i)); 
+      _digitalWrite(i, !bitRead(datos,7 - i)); 
       
     }
-    digitalWrite(fila+PIN_FILAS_INICIAL, HIGH);
-    //digitalWrite(fila+PIN_FILAS_INICIAL, LOW);  
+    _digitalWrite(fila+PIN_FILAS_INICIAL, HIGH);
+    //_digitalWrite(fila+PIN_FILAS_INICIAL, LOW);  
     //delay(500);
   }
 }
 
 void limpiar_fila(int fila) {
-  digitalWrite(fila+PIN_FILAS_INICIAL, LOW);
+  _digitalWrite(fila+PIN_FILAS_INICIAL, LOW);
   for(int c=0; c<8; c++){ //recorre columna  
-    digitalWrite(c, LOW); 
+    _digitalWrite(c, LOW); 
   } 
 }
 
@@ -300,7 +409,15 @@ void pintar_letra(byte letra[]){
   for(int i=0; i<6; i++){ //recorro los bytes(las filas que conforman la letra)
     pintar_fila(letra[i], i+PIN_FILAS_INICIAL);
     delay(5);
-    digitalWrite(i+PIN_FILAS_INICIAL, LOW);
+    _digitalWrite(i+PIN_FILAS_INICIAL, LOW);
     delay(5);    
   }  
+}
+
+void _digitalWrite(int pin, bool valor){
+  if (debug && (pin == 0 || pin == 1)){
+    
+  }else{
+    digitalWrite(pin,valor);  
+  }
 }

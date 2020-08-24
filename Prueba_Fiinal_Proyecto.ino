@@ -84,15 +84,7 @@ char actualizarLetraActual()
     return letraFinal;
 }
 
-void reiniciar()
-{
-    frase = "";
-    teclaActual = ' ';
-    cantidadPresionadas = 0;
-}
-
-////-------------------------------------- DISPLAY
-///-----------------------------------------------
+////-------------------------------------- DISPLAY -----------------------------------------------
 
 byte frase_columnas[84] = {};
 
@@ -101,6 +93,7 @@ int TAMANO_ESPACIO = 1;
 int posicion_movil = 0;
 int desplazarce = 1;
 int debug = 0;
+int mostrar_frase_movimiento = 0;
 
 byte letras[27][7] = {
   { 0B111110, 0B001001, 0B001001, 0B111110, 0B000000, 0B000000, 0B000000 }, //A
@@ -368,22 +361,7 @@ void loop()
                             //}
 
               //puse de aca ************************
-                            inicializar();
-                            actualizar_display();
-                            desplazarce = 1;
-                            frase_string = frase;
-                            Serial.println(frase_string);
-                            
-                            for(int i=0; i<TIEMPO_VISUALIZACION_LETRA; i++){
-                                VELOCIDAD++;
-                                mostrar_display();   
-                                //delay(1);
-                                
-                                if(VELOCIDAD==100){
-                                    actualizar_display();
-                                    VELOCIDAD = 0;
-                                }                                              
-                            }
+                            mostrar_frase_movimiento = 1;
                // hasta aca ************************** 
 
 
@@ -403,8 +381,29 @@ void loop()
             }
         } else {
 
-          Serial.print(".");
-          
+            //Serial.print(".");
+            if (mostrar_frase_movimiento == 1){
+             
+                inicializar();
+                actualizar_display();
+                desplazarce = 1;
+                frase_string = frase.substring(0);
+                Serial.println(" *********** ");
+                
+                //strcpy(frase, frase_string);
+                Serial.println(frase_string);
+                
+                for(int i=0; i<TIEMPO_VISUALIZACION_LETRA; i++){
+                    VELOCIDAD++;
+                    mostrar_display();   
+                    //delay(1);
+                    
+                    if(VELOCIDAD==10){
+                        actualizar_display();
+                        VELOCIDAD = 0;
+                    }                                              
+                }
+             }
         } 
     }// cierre while   
 
@@ -564,3 +563,18 @@ void limpiar_frase_columnas() {
         frase_columnas [i] = 0B00000000;   
     }   
 }
+
+
+void reiniciar(){
+     limpiar_frase_columnas(); 
+     desplazarce = 0;
+     frase = "";
+     posicion_movil  = 0;
+     posicion_disponible = 0;
+     frase_string = "";    
+     teclaActual = ' '; 
+     inicializar();
+     cantidadPresionadas = 0;
+     actualizar_display(); 
+     mostrar_frase_movimiento = 0;
+} 

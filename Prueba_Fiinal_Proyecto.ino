@@ -165,7 +165,7 @@ byte area_display[6] = {
     0B00000000, 0B00000000, 0B00000000, 0B00000000, 0B00000000, 0B00000000,
 };
 
-String frase_string = "CAB";
+String frase_string = "NNNNN"; //aca va la frase a mostrar en display
 int posicion_disponible = 0;
 
 void inicializar()
@@ -292,7 +292,10 @@ void loop()
                         }
 
                         frase_string = "";
-                        
+                        limpiar_area_display();    
+                        limpiar_frase_columnas();
+                        mostrar_display();
+                                            
                     
                 }
                 else {
@@ -352,16 +355,40 @@ void loop()
                         else if (len > 12) {
                             Serial.println("la frase es muy larga - MAXIMO 12 Caracteres");
                             Serial.println(frase1);
+                                                           
                             autorizado = "NO";
                         }
                         else {
     
                             //if (frase != '____________' ){
                             Serial.println(frase);
-                            autorizado = "NO";
+                            
                             //}else{
                             //Serial.println("La frase solo contiene espacios");
                             //}
+
+              //puse de aca ************************
+                            inicializar();
+                            actualizar_display();
+                            desplazarce = 1;
+                            frase_string = frase;
+                            Serial.println(frase_string);
+                            
+                            for(int i=0; i<TIEMPO_VISUALIZACION_LETRA; i++){
+                                VELOCIDAD++;
+                                mostrar_display();   
+                                //delay(1);
+                                
+                                if(VELOCIDAD==100){
+                                    actualizar_display();
+                                    VELOCIDAD = 0;
+                                }                                              
+                            }
+               // hasta aca ************************** 
+
+
+                           autorizado = "NO";
+                            
                         }
                     }
                     else {
@@ -374,6 +401,10 @@ void loop()
                    
                 }
             }
+        } else {
+
+          Serial.print(".");
+          
         } 
     }// cierre while   
 
@@ -497,6 +528,12 @@ void limpiar_fila(int fila)
     }
 }
 
+void limpiar_area_display(){
+    for (int f=0; f<6; f++){
+         area_display [f] = 0B00000000;        
+    }  
+}
+
 void pintar_letra(byte letra[])
 {
     for (int i = 0; i < 6;
@@ -515,4 +552,15 @@ void _digitalWrite(int pin, bool valor)
     else {
         digitalWrite(pin, valor);
     }
+}
+
+
+void limpiar_frase_columnas() {
+    int longitud = 0;
+
+    longitud = sizeof(frase_columnas);
+
+    for (int i=0; i<longitud; i++){
+        frase_columnas [i] = 0B00000000;   
+    }   
 }

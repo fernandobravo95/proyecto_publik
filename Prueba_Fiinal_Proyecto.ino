@@ -94,7 +94,7 @@ int TIEMPO_VISUALIZACION_LETRA = 20;
 int TAMANO_ESPACIO = 1;   //TAMAÑO DE ESPACIO
 int posicion_movil = 0;
 int desplazarce = 1;
-int debug = 1;
+int debug = 0;
 int mostrar_frase_movimiento = 0;
 
 String frase_mensaje = "";
@@ -201,6 +201,7 @@ void inicializar()
     posicion_disponible = 0;
 
     int tamano = frase_string.length();
+    
 
     // RECORRO CARACTER POR CARACTER PARA DIBUJARLA(BYTES) EN FRASE_COLUMNA
     for (int i = 0; i < tamano; i++) {
@@ -377,6 +378,7 @@ void loop()
                             //}
 
               //puse de aca ************************
+                            limpiar_area_display();
                             mostrar_frase_movimiento = 1;
                // hasta aca ************************** 
 
@@ -398,25 +400,27 @@ void loop()
         } else {
 
             //Serial.print(".");
-            if (mostrar_frase_movimiento == 1 || mostrar_frase_movimiento == 2){
+            if (mostrar_frase_movimiento == 1){
              
                 
-                
-                if (mostrar_frase_movimiento == 1){
+             
+                //if (mostrar_frase_movimiento == 1){
                     frase_string = frase.substring(0);
-                } else {
-                    frase_string = frase_mensaje.substring(0);
-                } 
+                //} else {
+                    //frase_string = frase_mensaje.substring(0);
+                //} 
                 
                 Serial.println(" *********** ");
 
+                
+                desplazarce = 1;
                 inicializar();
                 actualizar_display();
-                desplazarce = 1;
                 
                 //strcpy(frase, frase_string);
                 Serial.println(frase_string);
-                
+
+                                
                 for(int i=0; i<TIEMPO_VISUALIZACION_LETRA; i++){
                     VELOCIDAD++;
                     mostrar_display();   
@@ -569,11 +573,12 @@ void pintar_letra(byte letra[])
 
 void _digitalWrite(int pin, bool valor)
 {
-    if (debug && (pin == 0 || pin == 1)) {
+    digitalWrite(pin, valor);
+    /*if (debug && (pin == 0 || pin == 1)) {
     }
     else {
         digitalWrite(pin, valor);
-    }
+    }*/
 }
 
 
@@ -621,9 +626,9 @@ void evento_presionar_tecla(char a){
   for(int i=0; i<TIEMPO_VISUALIZACION_LETRA; i++){
       VELOCIDAD++;
       mostrar_display();   
-      delay(1);
+      //delay(1);
       
-      if(VELOCIDAD==10){
+      if(VELOCIDAD==100){
           actualizar_display();
           VELOCIDAD = 0;
       }                                              

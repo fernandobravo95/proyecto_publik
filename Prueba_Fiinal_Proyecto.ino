@@ -1,4 +1,5 @@
 #include <Keypad.h>
+#include <SoftwareSerial.h>
 
 ////-------------------------------------- TECLADO
 ///-----------------------------------------------
@@ -241,7 +242,9 @@ for(int b = 0 ; b<8 ; b++){
 
 void setup()
 {
+    Serial.end();
     Serial.begin(9600);
+    Serial.end();
 
     if (debug == 1) {
         for (int j = 2; j < 17; j++) {
